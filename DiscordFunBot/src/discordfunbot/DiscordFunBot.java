@@ -17,10 +17,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class DiscordFunBot extends ListenerAdapter {
 
 	public static void main(String[] args) throws LoginException, InterruptedException, IOException {
-		Path path = FileSystems.getDefault().getPath(".").toAbsolutePath();
-		System.out.println(path);
+
+		String homePath = System.getProperty("user.home");
+		System.out.println(homePath);
 		
-		File botTokenTxt = new File("token.txt");
+		File botTokenTxt = new File(homePath+"\\token.txt");
 		BufferedReader br = new BufferedReader(new FileReader(botTokenTxt));
 		
 		String botToken = br.readLine();

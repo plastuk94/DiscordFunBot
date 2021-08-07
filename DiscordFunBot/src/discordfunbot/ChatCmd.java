@@ -155,7 +155,6 @@ public class ChatCmd extends ListenerAdapter {
 		        	audioManager.setSendingHandler(playerHandler);
 		        	audioManager.openAudioConnection(myChannel);
 		        	
-		        	
 	        	}
 	        	break;
 	        }
