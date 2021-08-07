@@ -19,7 +19,6 @@ public class DiscordFunBot extends ListenerAdapter {
 	public static void main(String[] args) throws LoginException, InterruptedException, IOException {
 
 		String homePath = System.getProperty("user.home");
-		System.out.println(homePath);
 		
 		File botTokenTxt = new File(homePath+"\\token.txt");
 		BufferedReader br = new BufferedReader(new FileReader(botTokenTxt));
