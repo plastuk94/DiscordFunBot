@@ -42,7 +42,7 @@ public class ChatCmd extends ListenerAdapter {
 	    @Override
 	    public void onMessageReceived(MessageReceivedEvent event) {
 	    	// Ignore bot messages
-	        if(event.getAuthor().isBot()) {
+	        if(event.getAuthor().isBot()) { // Ignore all messages from bots.
 	            return;
 	        }
 	        
@@ -54,14 +54,14 @@ public class ChatCmd extends ListenerAdapter {
 	        // Gets the message that triggered the event
 	        Message msg = event.getMessage();
 	        MessageChannel channel = event.getChannel();
-	        Guild guild = event.getGuild();
+	        Guild guild = event.getGuild(); // Guild = Discord server
 	        
 	        switch (msg.getContentRaw()) {
 	        case "!ping" : // Respond to !ping with "Pong!"
 	        	channel.sendMessage("Pong! ").queue();
 	        	break;
 	        
-	        case "!file" : // Upload file (can be image)
+	        case "!file" : // Upload file (can be image, GIFs do not animate)
 	        	File image = new File("C:\\Users\\Justin\\Pictures\\2.png");
 	        	channel.sendFile(image).queue();
 	        	break;
@@ -71,7 +71,9 @@ public class ChatCmd extends ListenerAdapter {
 	        	String nsfw = "true";
 	        	ObjectMapper objectMapper = new ObjectMapper();
 	        	try {
-	        		while (nsfw.equals("true")) {
+	        		while (nsfw.equals("true")) { // No NSFW memes!
+	        			
+	        			// Use (https://github.com/D3vd/Meme_Api) to pull Reddit memes
 	            		RestApiRequest memeRequest = new RestApiRequest(new URL("https://meme-api.herokuapp.com/gimme/wholesomememes"),null);
 	            		Json = memeRequest.getResponse();
 	            		System.out.println(Json);
@@ -105,13 +107,13 @@ public class ChatCmd extends ListenerAdapter {
 	            channel.purgeMessages(msgs);
 	            break;
 	            
-	        case "!oof" :
+	        case "!oof" : // Post an image from Dropbox
 	        	
 	        	try {
 					DropboxAPIRequest dropboxRequest = new DropboxAPIRequest();
-					dropboxRequest.browseFiles();
+					dropboxRequest.browseFiles(); // Iterate through list of files in Dropbox folder.
 					
-					File oofFile = dropboxRequest.randomImage();
+					File oofFile = dropboxRequest.randomImage(); // Pick one from the list
 					channel.sendFile(oofFile).queue();
 					
 				} catch (IOException | DbxException e1) {
@@ -124,6 +126,7 @@ public class ChatCmd extends ListenerAdapter {
 	        	if (msg.getContentRaw().contains("!music ")) {
 	        		String identifier = msg.getContentRaw().replace("!music ", "");
 	        		
+	        		// Play music in "General" voice channel for now.
 		        	VoiceChannel myChannel = event.getGuild().getVoiceChannelsByName("General", true).get(0);
 		        	AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
 		   
@@ -141,9 +144,9 @@ public class ChatCmd extends ListenerAdapter {
 		        	}	
 		        	
 		        	try {
-						new URL(identifier);
+						new URL(identifier); // Check if a valid URL
 					} catch (MalformedURLException e) {
-						identifier = ("ytsearch:"+identifier);
+						identifier = ("ytsearch:"+identifier); // otherwise, search Youtube
 					}
 		        	
 		        	playerManager.loadItem(identifier, new AudioLoadResultHandler() {
@@ -162,11 +165,11 @@ public class ChatCmd extends ListenerAdapter {
 		        	    }
 		        	    @Override
 		        	    public void loadFailed(FriendlyException throwable) {
-		        	        // Notify the user that everything exploded
+		        	        // Notify the user that load failed
 		        	    }
 		        	});
 		        	
-		        	
+		        	// Connect to audio for channel.
 		        	AudioManager audioManager = guild.getAudioManager();
 		        	audioManager.setSendingHandler(playerHandler);
 		        	audioManager.openAudioConnection(myChannel);
