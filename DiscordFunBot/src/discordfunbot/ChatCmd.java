@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.dropbox.core.DbxException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -103,6 +104,21 @@ public class ChatCmd extends ListenerAdapter {
 	            msgs = history.retrievePast(100).complete();
 	            channel.purgeMessages(msgs);
 	            break;
+	            
+	        case "!oof" :
+	        	
+	        	try {
+					DropboxAPIRequest dropboxRequest = new DropboxAPIRequest();
+					dropboxRequest.browseFiles();
+					
+					File oofFile = dropboxRequest.randomImage();
+					channel.sendFile(oofFile).queue();
+					
+				} catch (IOException | DbxException e1) {
+					e1.printStackTrace();
+				}
+	        	
+	        	break;
 
 	        default:
 	        	if (msg.getContentRaw().contains("!music ")) {

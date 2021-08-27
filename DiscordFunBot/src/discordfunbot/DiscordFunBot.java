@@ -24,8 +24,7 @@ public class DiscordFunBot extends ListenerAdapter {
 		BufferedReader br = new BufferedReader(new FileReader(botTokenTxt));
 		
 		String botToken = br.readLine();
-		
-
+		br.close();
 		
 		JDA jda = JDABuilder.createDefault(botToken)
 	            .addEventListeners(new ChatCmd())
