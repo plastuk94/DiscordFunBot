@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,8 +29,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -37,11 +41,13 @@ public class ChatCmd extends ListenerAdapter {
 
 	private HashMap<String, Boolean> configOptions;
 	boolean noConfig;
+	MessageQuoteDatabase messageDatabase;
 
 	ChatCmd() {
 		String homePath = System.getProperty("user.home");
 		File configFile = new File(homePath + "\\config.txt"); // Read config.txt for cat functions to disable.
 		try {
+			messageDatabase = new MessageQuoteDatabase();
 			configOptions = new HashMap<String, Boolean>();
 			BufferedReader br = new BufferedReader(new FileReader(configFile));
 			String configLine = br.readLine();
@@ -75,7 +81,32 @@ public class ChatCmd extends ListenerAdapter {
 		} catch (IOException e) {
 			System.out.println("Config file not found, enabling all chat functions.");
 			noConfig = true;
+		} catch (SQLException e) {
+			System.out.println("ERROR: Failed to access Message Database.");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		ReactionEmote emoji     = event.getReactionEmote();
+		String        messageId = event.getMessageId();
+		Guild         guild     = event.getGuild();
+		TextChannel   channel   = guild.getDefaultChannel();
+		Message       msg       = channel.retrieveMessageById(messageId).complete(); //Blocks until complete
+		String        emojiCode = emoji.getAsCodepoints();
+		
+		System.out.println(emojiCode);
+
+		if (emojiCode.equals("U+1f4ac")) {
+			try {
+				messageDatabase.processMessage(msg);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	@Override
@@ -97,7 +128,6 @@ public class ChatCmd extends ListenerAdapter {
 		Guild guild = event.getGuild(); // Guild = Discord server
 
 		String messageText = msg.getContentRaw();
-
 		Boolean runCommand = true;
 
 		if (configOptions != null) {
@@ -180,6 +210,15 @@ public class ChatCmd extends ListenerAdapter {
 					e1.printStackTrace();
 				}
 
+				break;
+
+			case "!quote":
+				try {
+					String randomQuote = messageDatabase.randomQuote();
+					channel.sendMessage(randomQuote).queue();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
 				break;
 
 			default:
