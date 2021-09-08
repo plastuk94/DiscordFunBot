@@ -1,5 +1,7 @@
 package discordfunbot;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-
 import com.dropbox.core.DbxException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,9 +43,10 @@ public class ChatCmd extends ListenerAdapter {
 	private HashMap<String, Boolean> configOptions;
 	boolean noConfig;
 	MessageQuoteDatabase messageDatabase;
+	String homePath;
 
 	ChatCmd() {
-		String homePath = System.getProperty("user.home");
+		homePath = System.getProperty("user.home");
 		File configFile = new File(homePath + "\\config.txt"); // Read config.txt for cat functions to disable.
 		try {
 			messageDatabase = new MessageQuoteDatabase();
@@ -151,8 +153,25 @@ public class ChatCmd extends ListenerAdapter {
 				break;
 
 			case "!file": // Upload file (can be image, GIFs do not animate)
-				File image = new File("C:\\Users\\Justin\\Pictures\\2.png");
-				channel.sendFile(image).queue();
+				
+				FileDialog fileDialog; // Using FileDialog instead of JFileChooser to see image thumbnails.
+				fileDialog = new FileDialog(new Frame(),"Choose a file",FileDialog.LOAD);
+				fileDialog.setMultipleMode(false);
+				fileDialog.setVisible(true);
+				
+				String fileDir  = fileDialog.getDirectory();
+				String filePath = fileDialog.getFile();
+
+				if (fileDir == null || filePath == null) {
+					System.out.println("Invalid file path");
+				}
+
+				else {
+					File image = new File(fileDir, filePath); // Check for null directory / path
+					if (image != null) {
+						channel.sendFile(image).queue();
+					}
+				}
 				break;
 
 			case "!meme": // Post a random meme from Reddit.

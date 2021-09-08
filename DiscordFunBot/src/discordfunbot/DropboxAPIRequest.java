@@ -13,15 +13,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 
-
-
-public class DropboxAPIRequest {
+public class DropboxAPIRequest { 
 	
 	private DbxClientV2      client;
 	private DbxRequestConfig config;
@@ -30,7 +32,10 @@ public class DropboxAPIRequest {
 	DropboxAPIRequest() throws IOException{
 		
 		String homePath = System.getProperty("user.home");
+		
+		//OAuth2 not implemented yet. Currently just generating tokens from the account.
 		File accessTokenTxt = new File(homePath+"\\dropboxtoken.txt");
+		
 		BufferedReader br = new BufferedReader(new FileReader(accessTokenTxt));
 		ACCESS_TOKEN = br.readLine();
 		br.close();
@@ -56,7 +61,8 @@ public class DropboxAPIRequest {
 			for (Metadata metadata : result.getEntries()) {
 				String filePath = metadata.getPathLower();
 				
-				if ((filePath.contains(".jpg")) || (filePath.contains(".png")) || filePath.contains(".gif")) {
+				/*if ((filePath.contains(".jpg")) || (filePath.contains(".png")) || filePath.contains(".gif")) {*/
+				if (filePath != null) {
 					System.out.println(filePath);
 					filePaths.add(filePath);
 				}
@@ -81,10 +87,34 @@ public class DropboxAPIRequest {
 		
 		DbxDownloader<FileMetadata> downloader = client.files().download(randomPath);
 		
-		File oofFile = new File("oof.jpg");
+		File oofFile;
+		Boolean isAnimated = false;
+		
+		if (randomPath.contains("gif")) {
+			oofFile = new File("oof.gif");
+			isAnimated = true;
+		}
+		
+		else {
+			System.out.println("Random path: "+randomPath);
+			String fileExt = randomPath.split("\\.")[1]; // Grabs file extension
+			oofFile = new File("oof."+fileExt);
+		}
 		
 		FileOutputStream fout = new FileOutputStream(oofFile);
-		downloader.download(fout);
+		
+		
+		if (isAnimated) { // Animated GIFs need to be processed as a stream of bytes.
+			InputStream is = downloader.getInputStream();
+			byte[] oofBytes = IOUtils.toByteArray(is);
+			FileUtils.writeByteArrayToFile(oofFile, oofBytes);
+			is.close();
+		}
+		
+		else {
+			downloader.download(fout);
+		}
+		
 		fout.flush();
 		fout.close();
 		
