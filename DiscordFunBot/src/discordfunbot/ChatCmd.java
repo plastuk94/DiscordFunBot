@@ -196,6 +196,8 @@ public class ChatCmd extends ListenerAdapter {
 							channel.sendFile(memeFile).queue();
 							break;
 						}
+						memeFile.delete();
+						memeFile = null; // Allow it to be garbage collected?
 						break;
 					}
 				} catch (IOException e) {
@@ -224,6 +226,9 @@ public class ChatCmd extends ListenerAdapter {
 
 					File oofFile = dropboxRequest.randomImage(); // Pick one from the list
 					channel.sendFile(oofFile).queue();
+					
+					oofFile.delete();
+					oofFile = null;
 
 				} catch (IOException | DbxException e1) {
 					e1.printStackTrace();
@@ -258,6 +263,7 @@ public class ChatCmd extends ListenerAdapter {
 					if (identifier.equals("stop")) {
 						System.out.println("Stopping player...");
 						guild.getAudioManager().closeAudioConnection();
+						player.destroy();
 						break;
 					}
 
