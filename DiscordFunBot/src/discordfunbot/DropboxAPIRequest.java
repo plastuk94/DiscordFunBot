@@ -1,14 +1,4 @@
 package discordfunbot;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.DownloadErrorException;
-import com.dropbox.core.v2.files.FileMetadata;
-import com.dropbox.core.v2.files.ListFolderBuilder;
-import com.dropbox.core.v2.files.ListFolderErrorException;
-import com.dropbox.core.v2.files.ListFolderResult;
-import com.dropbox.core.v2.files.Metadata;
-import com.dropbox.core.v2.users.FullAccount;
-import com.dropbox.core.DbxRequestConfig;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,12 +7,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.DownloadErrorException;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.ListFolderErrorException;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.users.FullAccount;
 
 public class DropboxAPIRequest { 
 	
@@ -58,15 +57,19 @@ public class DropboxAPIRequest {
 		
 		ListFolderResult result = client.files().listFolderBuilder("").withRecursive(true).start();
 		ArrayList<String> filePaths = new ArrayList<String>();
+		String pattern = "/.+/.+[.].{3,}";
 		
 		while (true) {
 			for (Metadata metadata : result.getEntries()) {
 				String filePath = metadata.getPathLower();
 				
 				/*if ((filePath.contains(".jpg")) || (filePath.contains(".png")) || filePath.contains(".gif")) {*/
-				if (filePath != null) {
-					System.out.println(filePath);
-					filePaths.add(filePath);
+				if ((filePath != null)) {
+					if (Pattern.matches(pattern, filePath)) {
+						System.out.println(filePath);
+						filePaths.add(filePath);
+					}
+
 				}
 			}
 			
@@ -86,6 +89,7 @@ public class DropboxAPIRequest {
 		
 		int randomNum = ThreadLocalRandom.current().nextInt(0, (filePaths.size()));
 		String randomPath = filePaths.get(randomNum);
+		System.out.println("Random path: "+randomPath);
 		
 		DbxDownloader<FileMetadata> downloader = client.files().download(randomPath);
 		
@@ -98,7 +102,6 @@ public class DropboxAPIRequest {
 		}
 		
 		else {
-			System.out.println("Random path: "+randomPath);
 			String fileExt = randomPath.split("\\.")[1]; // Grabs file extension
 			oofFile = new File("oof."+fileExt);
 		}
