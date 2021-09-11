@@ -2,6 +2,7 @@ package discordfunbot;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.DownloadErrorException;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.ListFolderBuilder;
 import com.dropbox.core.v2.files.ListFolderErrorException;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
@@ -54,7 +55,8 @@ public class DropboxAPIRequest {
 	}
 	
 	public ArrayList<String> browseFiles() throws ListFolderErrorException, DbxException {
-		ListFolderResult result = client.files().listFolder("");
+		
+		ListFolderResult result = client.files().listFolderBuilder("").withRecursive(true).start();
 		ArrayList<String> filePaths = new ArrayList<String>();
 		
 		while (true) {
