@@ -47,7 +47,7 @@ public class ChatCmd extends ListenerAdapter {
 
 	ChatCmd() {
 		homePath = System.getProperty("user.home");
-		File configFile = new File(homePath + "\\config.txt"); // Read config.txt for cat functions to disable.
+		File configFile = new File(homePath,"config.txt"); // Read config.txt for cat functions to disable.
 		try {
 			messageDatabase = new MessageQuoteDatabase();
 			configOptions = new HashMap<String, Boolean>();

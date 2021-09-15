@@ -20,7 +20,12 @@ public class MessageQuoteDatabase {
 
 	MessageQuoteDatabase() throws SQLException, ClassNotFoundException {
 		Class.forName("org.sqlite.JDBC");
-		connection = DriverManager.getConnection("jdbc:sqlite:C:/sqlite/discordquotes.db");
+		if (System.getProperty("os.name").contains("indows")) {
+			connection = DriverManager.getConnection("jdbc:sqlite:C:/sqlite/discordquotes.db"); // Completely unnecessary and Windows specific
+		} else {
+			connection = DriverManager.getConnection("jdbc:sqlite:"+System.getProperty("user.home")+"/discordquotes.db"); // Preferable
+		}
+		
 		statement = connection.createStatement();
 		statement.setQueryTimeout(30);
 	}

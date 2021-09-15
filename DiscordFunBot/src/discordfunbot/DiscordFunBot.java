@@ -16,7 +16,7 @@ public class DiscordFunBot {
 		// For now, storing token in "token.txt" in user's home directory.
 		
 		String homePath = System.getProperty("user.home");
-		File botTokenTxt = new File(homePath+"\\token.txt");
+		File botTokenTxt = new File(homePath, "token.txt");
 		BufferedReader br = new BufferedReader(new FileReader(botTokenTxt));
 		String botToken = br.readLine();
 		br.close();

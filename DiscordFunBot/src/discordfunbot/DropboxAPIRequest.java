@@ -36,7 +36,7 @@ public class DropboxAPIRequest {
 
 		// OAuth2 not implemented yet. Currently just generating tokens from the
 		// account.
-		File accessTokenTxt = new File(homePath + "\\dropboxtoken.txt");
+		File accessTokenTxt = new File(homePath,"dropboxtoken.txt");
 
 		BufferedReader br = new BufferedReader(new FileReader(accessTokenTxt));
 		ACCESS_TOKEN = br.readLine();
@@ -59,7 +59,7 @@ public class DropboxAPIRequest {
 
 		ListFolderResult result = client.files().listFolderBuilder("").withRecursive(true).start();
 		ArrayList<String> filePaths = new ArrayList<String>();
-		String pattern = "/.+/.+[.].{3,}";
+		String pattern = "/.+/*.+[.].{3,}";
 
 		while (true) {
 			for (Metadata metadata : result.getEntries()) {
@@ -71,9 +71,9 @@ public class DropboxAPIRequest {
 				 */
 				if ((filePath != null)) {
 					if (Pattern.matches(pattern, filePath)) {
-						System.out.println(filePath);
 						filePaths.add(filePath);
-					}
+						System.out.println(filePath);
+					} 
 					
 				}
 			}
